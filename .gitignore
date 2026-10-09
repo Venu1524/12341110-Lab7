@@ -1,0 +1,19 @@
+# Python virtual environments & bytecode
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Logs and temporary files
+*.log
+scratch/
+
+# Report files (excluded as requested)
+*.pdf
+REPORT.md
+generate_pdf_report.py
+Lab7_Report.pdf
+Lab7_Report_v2.pdf
+Lab7_Report_Student.pdf
+Assignment_Report_Katari_Venu.pdf
+Assignment_Report_Katari_Venu_v2.pdf
