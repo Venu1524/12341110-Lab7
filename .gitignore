@@ -12,8 +12,13 @@ scratch/
 *.pdf
 REPORT.md
 generate_pdf_report.py
+generate_lab9_report.py
+create_screenshots.py
+report_screenshots/
 Lab7_Report.pdf
 Lab7_Report_v2.pdf
 Lab7_Report_Student.pdf
 Assignment_Report_Katari_Venu.pdf
 Assignment_Report_Katari_Venu_v2.pdf
+12341110_Lab9.pdf
+Lab9_Docker_Report_Katari_Venu.pdf

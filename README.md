@@ -4,7 +4,24 @@ A high-performance geospatial proximity search web API that recommends the 10 cl
 
 ---
 
-## Quick Start
+## Lab 9: Docker Quick Start (One-Command Full-Stack)
+
+Containerise and run the entire multi-service stack with a single command:
+```bash
+docker compose up --build -d
+```
+
+### Accessing the Stack
+- **Unified Web & API Gateway (Nginx):** [http://localhost:8080/](http://localhost:8080/)
+- **Proximity Search API Endpoint:** [http://localhost:8080/search/?lat=0.505051&long=0.505051&cat=cafe&rad=0.15](http://localhost:8080/search/?lat=0.505051&long=0.505051&cat=cafe&rad=0.15)
+- **Direct Backend API:** [http://localhost:5000/health](http://localhost:5000/health)
+- **Inspect Services:** `docker compose ps`
+- **View Integration Test Suite Output:** `docker compose logs tester`
+- **Stop Stack:** `docker compose down`
+
+---
+
+## Local Development (Without Docker)
 
 ### 1. Run the API Server
 

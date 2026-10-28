@@ -1,0 +1,98 @@
+# ==============================================================================
+# Docker Compose Specification for Proximity Search API Multi-Service Stack
+# Lab 9: Docker
+# Student: Katari Venu (12341110)
+# Instructor: Vikrant Sahu
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # Service 1: Backend Proximity Search Engine API
+  # ----------------------------------------------------------------------------
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: proximity-api
+    restart: unless-stopped
+    environment:
+      - PORT=5000
+      - WORKERS=${WORKERS:-3}
+      - TIMEOUT=${TIMEOUT:-60}
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - DATA_CSV_PATH=${DATA_CSV_PATH:-/app/data/locations.csv}
+      - DEFAULT_LINK_PATH=${DEFAULT_LINK_PATH:-/app/data/link.txt}
+    volumes:
+      - ./data:/app/data:ro
+      - proximity-api-logs:/app/logs
+    networks:
+      - proximity-net
+    expose:
+      - "5000"
+    ports:
+      - "${API_PORT:-5000}:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  # ----------------------------------------------------------------------------
+  # Service 2: Nginx Reverse Proxy & HTTP Gateway
+  # ----------------------------------------------------------------------------
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: proximity-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - proximity-nginx-logs:/var/log/nginx
+    networks:
+      - proximity-net
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1/nginx-health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 3s
+
+  # ----------------------------------------------------------------------------
+  # Service 3: Automated Integration Test Runner
+  # ----------------------------------------------------------------------------
+  tester:
+    build:
+      context: ./tester
+      dockerfile: Dockerfile
+    container_name: proximity-tester
+    restart: "no"
+    environment:
+      - TARGET_URL=http://web:80
+    depends_on:
+      web:
+        condition: service_healthy
+    networks:
+      - proximity-net
+
+# ------------------------------------------------------------------------------
+# Isolated Bridge Network for Inter-Service Communication & DNS Resolution
+# ------------------------------------------------------------------------------
+networks:
+  proximity-net:
+    name: proximity-net
+    driver: bridge
+
+# ------------------------------------------------------------------------------
+# Persistent Named Volumes for Logging and State Isolation
+# ------------------------------------------------------------------------------
+volumes:
+  proximity-api-logs:
+    name: proximity-api-logs
+  proximity-nginx-logs:
+    name: proximity-nginx-logs
